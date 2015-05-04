@@ -1,0 +1,25 @@
+{
+  "name": "nba-seasonal-wins",
+  "version": "1.0.0",
+  "description": "Data visualization of the nba bandwagon",
+  "main": "data.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/codenameyau/nba-seasonal-wins.git"
+  },
+  "keywords": [
+    "NBA",
+    "nba",
+    "data",
+    "visualization"
+  ],
+  "author": "Jorge Yau <jyau01@citymail.cuny.edu>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/codenameyau/nba-seasonal-wins/issues"
+  },
+  "homepage": "https://github.com/codenameyau/nba-seasonal-wins"
+}
