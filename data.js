@@ -4,7 +4,8 @@
  * https://github.com/codenameyau/nba-seasonal-wins
  *
  * Description:
- * Run this nodejs script to grab and clean the seasonal team data.
+ * Run this nodejs script to scrape basketball-reference data.
+ * It is nightmare to parse, but very efficient,
  */
 'use strict';
 
@@ -13,47 +14,85 @@
 * Dependencies
 ***************************************************************/
 var request = require('request');
+var cheerio = require('cheerio');
+var util = require('util');
 
 
 /***************************************************************
 * Globals
 ***************************************************************/
-var API_ENDPOINT = 'https://erikberg.com/nba/team-stats/';
-var API_FORMAT = '.json';
-
-// Create an environment variable with your API key.
-var ACCESS_KEY = process.env.XMLSTATS_API_KEY;
-var USER_AGENT = 'NBAStatsBot/6.9';
+var SCRAPE_URL = 'http://www.basketball-reference.com/leagues/';
 
 
 /***************************************************************
 * Functions
 ***************************************************************/
-var getUrl = function(resource) {
-  return API_ENDPOINT + resource + API_FORMAT;
+var getURL = function(resource) {
+  return SCRAPE_URL + resource;
 };
 
-var getOptions = function(resourceURL) {
-  return {
-    url: resourceURL,
-    headers: {
-      'Authorization': 'Bearer ' + ACCESS_KEY,
-      'User-Agent': USER_AGENT
-    }
+var parseDivision = function($row) {
+  return $row.find('.black_text')[0].children[0].data;
+};
+
+var parseTeamStanding = function($row, divison) {
+  var teamStanding = {
+    'wins': 0,
+    'loses': 0,
+    'win_lose_percent': 0.0,
+    'games_behind': 0.0,
+    'points_per_game': 0.0,
+    'points_allowed': 0.0,
+    'simple_rating_sysmte': 0.0,
   };
+  debugger;
+  $row.children().each(function(i, col) {
+
+  });
 };
 
-var requestGetStandings = function() {
-  var resource = 'standings';
-  var options = getOptions(getUrl(resource));
+var parseConference = function($, conference) {
+  var currentDivision;
+  var nbaTeams = [];
+  $(conference).find('tbody tr').each(function(i, row) {
+    var $row = $(row);
 
-  // On hiatus until I get an API KEY.
-  request.get(options, function(err, res) {
-    console.log(res);
+    // Table header for Division.
+    if ($row.hasClass('partial_table')) {
+      currentDivision = parseDivision($row);
+    }
+
+    // Table row for team standings.
+    else if ($row.hasClass('full_table')) {
+      nbaTeams.push(parseTeamStanding($row, currentDivision));
+    }
+  });
+  return nbaTeams;
+};
+
+var parseStandings = function(body) {
+  var teamData = [];
+  var $ = cheerio.load(body);
+  teamData.concat(parseConference($, '#E_standings'));
+  // teamData.concat(parseConference($, '#W_standings'));
+  return teamData;
+};
+
+var getRequestStandings = function(year) {
+  var url = getURL(util.format('NBA_%d.html', year));
+
+  // Scrape and parse the response data.
+  request.get(url, function(err, res, body) {
     if (!err && res.statusCode === 200) {
-      console.log('Yay!');
+      var data = parseStandings(body);
     }
   });
 };
 
-requestGetStandings();
+
+/***************************************************************
+* Main Program
+***************************************************************/
+(function() {
+  getRequestStandings(2013);
+})();
