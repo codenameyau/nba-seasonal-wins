@@ -24,6 +24,6 @@
   "homepage": "https://github.com/codenameyau/nba-seasonal-wins",
   "dependencies": {
     "async": "^1.0.0",
-    "basketball-reference": "^1.0.0"
+    "basketball-reference": "^1.0.1"
   }
 }

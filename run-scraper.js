@@ -29,21 +29,25 @@ var range = function(start, stop, step) {
 
 var saveData = function(filename, data) {
   var filepath = DATA_DIR + filename;
+  data = JSON.stringify(data);
   fs.writeFile(filepath, data, function(error) {
     if (error) {
-      console.log(format('[-] Could not save: %s', filepath));
+      console.log(format('Could not save: %s', filepath));
     } else {
-      console.log(format('[+] Created: %s', filepath));
+      console.log(format('Created: %s', filepath));
     }
   });
 };
 
 var saveLeagueStandings = function(startYear, endYear) {
-  async.each(range(startYear, endYear), function(year) {
+  var standings = [];
+  async.each(range(startYear, endYear), function(year, cb) {
     scraper.getLeagueStandings(year, function(data) {
-      var filename = format('%s-%d.json', 'standings', year);
-      saveData(filename, data);
+      standings.push(data);
+      cb();
     });
+  }, function() {
+    saveData('nba-standings.json', standings);
   });
 };
 
