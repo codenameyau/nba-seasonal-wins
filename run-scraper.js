@@ -27,9 +27,16 @@ var range = function(start, stop, step) {
   return list;
 };
 
+var sortObject = function(object, criteria) {
+  return object.sort(function(left, right) {
+    return (left[criteria] < right[criteria]) ? -1 :
+           (left[criteria] > right[criteria]) ?  1 : 0;
+  });
+};
+
 var saveData = function(filename, data) {
   var filepath = DATA_DIR + filename;
-  data = JSON.stringify(data);
+  data = JSON.stringify(data, null, '');
   fs.writeFile(filepath, data, function(error) {
     if (error) {
       console.log(format('Could not save: %s', filepath));
@@ -46,9 +53,9 @@ var saveLeagueStandings = function(startYear, endYear) {
       standings.push(data);
       cb();
     });
-  }, function() {
-    saveData('nba-standings.json', standings);
-  });
+    }, function() {
+      saveData('nba-standings.json', sortObject(standings, 'year'));
+    });
 };
 
 
@@ -59,6 +66,7 @@ var saveLeagueStandings = function(startYear, endYear) {
   var start = parseInt(process.argv[2], 10);
   var end = parseInt(process.argv[3], 10);
   if (start && end) {
+    console.log(format('Scraping league data for: %d - %d', start, end));
     saveLeagueStandings(start, end);
   } else {
     console.log('Please specify a start and end year.');
