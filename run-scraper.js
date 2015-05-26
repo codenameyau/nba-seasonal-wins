@@ -27,7 +27,7 @@ var range = function(start, stop, step) {
   return list;
 };
 
-var sortObject = function(object, criteria) {
+var sortByProperty = function(object, criteria) {
   return object.sort(function(left, right) {
     return (left[criteria] < right[criteria]) ? -1 :
            (left[criteria] > right[criteria]) ?  1 : 0;
@@ -54,7 +54,7 @@ var saveLeagueStandings = function(startYear, endYear) {
       cb();
     });
     }, function() {
-      saveData('nba-standings.json', sortObject(standings, 'year'));
+      saveData('nba-standings.json', sortByProperty(standings, 'year'));
     });
 };
 
