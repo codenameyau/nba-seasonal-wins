@@ -40,15 +40,35 @@ var checkCallback = function(callback, args) {
   }
 };
 
+var createDirectory = function(name, callback, mask) {
+  mask = mask || 484 ; // permissions: 484 = 0744
+  fs.mkdir(name, mask, function(error) {
+    if (error) {
+      if (error.code === 'EEXIST') {
+        callback(null);
+      } else {
+        callback(error);
+      }
+    } else {
+      callback(null);
+    }
+  });
+};
+
 var saveData = function(filename, data) {
   var filepath = DATA_DIR + filename;
   data = JSON.stringify(data, null, '');
-  fs.writeFile(filepath, data, function(error) {
+  createDirectory(DATA_DIR, function(error) {
     if (error) {
-      console.log(format('Could not save: %s', filepath));
-    } else {
-      console.log(format('Created: %s', filepath));
+      console.log(format('Could not create directory: %s', DATA_DIR));
     }
+    fs.writeFile(filepath, data, function(error) {
+      if (error) {
+        console.log(format('Could not save: %s', filepath));
+      } else {
+        console.log(format('Created: %s', filepath));
+      }
+    });
   });
 };
 
