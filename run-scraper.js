@@ -86,17 +86,6 @@ var saveDataSeries = function(standings, parameter) {
 
 var saveLeagueStandings = function(startYear, endYear) {
   var standings = [];
-  var categories = [
-    'seed',
-    'wins',
-    'loses',
-    'win_percentage',
-    'games_behind',
-    'points_per_game',
-    'points_allowed',
-    'simple_rating_system'
-  ];
-
   async.each(range(startYear, endYear),
     function(year, callback) {
       scraper.getLeagueStandings(year, function(data) {
@@ -106,9 +95,6 @@ var saveLeagueStandings = function(startYear, endYear) {
     }, function() {
       var sortedStandings = sortByProperty(standings, 'year');
       saveData('standings.json', sortedStandings);
-      async.each(categories, function(category) {
-        saveDataSeries(sortedStandings, category);
-      });
     });
 };
 
